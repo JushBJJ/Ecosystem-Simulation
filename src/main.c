@@ -3,6 +3,6 @@
 
 int main(void)
 {
-    Animal();
+    Organisms();
     return 0;
 }
