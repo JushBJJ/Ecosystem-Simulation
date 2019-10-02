@@ -30,15 +30,15 @@ ifdef ComSpec
 	SRC_DIR = ./src/
 	TEST_DIR = ./test/
 	HDR_DIR = $(SRC_DIR)headers/
-	Animal_SRC = $(SRC_DIR)Animal/
+	Organisms_SRC = $(SRC_DIR)Organisms/
 	Enviorment_SRC = $(SRC_DIR)Enviorment/
 
-	VPATHX = $(SRC_DIR) $(Animal_SRC) $(Enviorment_SRC)
+	VPATHX = $(SRC_DIR) $(Organisms_SRC) $(Enviorment_SRC)
 	VPATH = $(subst /,\,$(VPATHX))
 
 	# Files
-	SRC_FILES = $(wildcard $(Animal_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
-	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Animal_SRC)*.h $(HDR_DIR)*.h)
+	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
+	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Organisms_SRC)*.h $(HDR_DIR)*.h)
 	OBJ_FILESX = $(patsubst $(SRC_DIR)%.c,$(BUILD_DIR)%.o,$(SRC_FILES))
 	OBJ_FILES = $(subst /,\,$(OBJ_FILESX))
 
@@ -59,15 +59,15 @@ ifndef ComSpec
 	SRC_DIR = ./src/
 	HDR_DIR = $(SRC_DIR)headers/
 	TEST_DIR = ./test/
-	Animal_SRC = $(SRC_DIR)Animal/
+	Organisms_SRC = $(SRC_DIR)Organisms/
 	Enviorment_SRC = $(SRC_DIR)Enviorment/
 	Current_Directory = $(shell pwd)/
 
-	VPATH = $(SRC_DIR) $(Animal_SRC) $(Enviorment_SRC)
+	VPATH = $(SRC_DIR) $(Organisms_SRC) $(Enviorment_SRC)
 
 	# Files
-	SRC_FILES = $(wildcard $(Animal_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
-	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Animal_SRC)*.h $(HDR_DIR)*.h)
+	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
+	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Organisms_SRC)*.h $(HDR_DIR)*.h)
 	OBJ_FILES = $(patsubst $(SRC_DIR)%.c,$(BUILD_DIR)%.o,$(SRC_FILES))
 	OBJ_FILESX = $(OBJ_FILES)
 
