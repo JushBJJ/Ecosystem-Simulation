@@ -1,0 +1,11 @@
+[DEBUG]: DEBUG MODE
+[DEBUG]: New Area ID: 0
+[DEBUG]: Constructing Area...
+[DEBUG]: Building objects...
+[DEBUG]: Initialized Objects
+[DEBUG]: Finshed constructing Area 0.
+[DEBUG]: Destroying Objects.
+[DEBUG]: Destroyed Objects
+[DEBUG]: Resetting Areas...
+[DEBUG]: Resetted Areas.
+[DEBUG]: PROGRAM EXIT.
