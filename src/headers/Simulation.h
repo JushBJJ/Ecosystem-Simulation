@@ -7,6 +7,9 @@
 #include <Debug.h>
 #include <stdbool.h>
 
+void Signal_Handler(int n);
+void Signal_Handler_SEGMENTATION_FAULT(int n);
+
 #ifdef Windows
 #include <Windows.h>
 typedef struct Win32_Terminal_Info
@@ -14,7 +17,10 @@ typedef struct Win32_Terminal_Info
     HANDLE hConsoleOut;
     COORD consoleSize;
     CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-    
+    HANDLE hScreenMutex; // N
+    HANDLE hRunMutex;    // N
+    int ThreadNr;        // N
+
     bool Vaild;
 } Win32_Terminal_Info;
 
@@ -25,20 +31,25 @@ Win32_Terminal_Info Init(void);
 #define Max_Length 1000
 #define Max_Width 1000
 
-typedef struct
+typedef struct Area
 {
-
-    const size_t Length;
-    const size_t Width;
-
     size_t Total_Population;
     size_t Total_Animal_Population;
     size_t Total_Organism_Population;
 
+    size_t Length;
+    size_t Width;
+
+    size_t ID;
+    struct Area *next;
+    struct Area *prev;
 } Area;
 
-Area New_Area(const int Length, const int Width);
-Area New_Default_Area(void);
-void Construct_Area(Area a);
+size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Reset);
+size_t New_Default_Area(bool Construct, bool Reset);
+
+void Init_ID(void);
+void Construct_Area(Area *a);
 void IMMEDIATE_ABORT(void);
+void Reset_Areas(bool EXIT);
 #endif

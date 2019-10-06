@@ -30,14 +30,16 @@ ifdef ComSpec
 	SRC_DIR = ./src/
 	TEST_DIR = ./test/
 	HDR_DIR = $(SRC_DIR)headers/
+
 	Organisms_SRC = $(SRC_DIR)Organisms/
 	Enviorment_SRC = $(SRC_DIR)Enviorment/
+	Debug_SRC = $(SRC_DIR)Debug/
 
 	VPATHX = $(SRC_DIR) $(Organisms_SRC) $(Enviorment_SRC)
 	VPATH = $(subst /,\,$(VPATHX))
 
 	# Files
-	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
+	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c *.c $(Debug_SRC)*.c)
 	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Organisms_SRC)*.h $(HDR_DIR)*.h)
 	OBJ_FILESX = $(patsubst $(SRC_DIR)%.c,$(BUILD_DIR)%.o,$(SRC_FILES))
 	OBJ_FILES = $(subst /,\,$(OBJ_FILESX))
@@ -59,15 +61,19 @@ ifndef ComSpec
 	SRC_DIR = ./src/
 	HDR_DIR = $(SRC_DIR)headers/
 	TEST_DIR = ./test/
+
 	Organisms_SRC = $(SRC_DIR)Organisms/
 	Enviorment_SRC = $(SRC_DIR)Enviorment/
+	 = $(SRC_DIR)Win32/
+	Debug_SRC = $(SRC_DIR)Debug/
+
 	Current_Directory = $(shell pwd)/
 
 	VPATH = $(SRC_DIR) $(Organisms_SRC) $(Enviorment_SRC)
 
 	# Files
-	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c)
-	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Organisms_SRC)*.h $(HDR_DIR)*.h)
+	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c *.c $(Debug_SRC)*.c)
+	HEADER_FILES = $(wildcard $(HDR_DIR)*.h)
 	OBJ_FILES = $(patsubst $(SRC_DIR)%.c,$(BUILD_DIR)%.o,$(SRC_FILES))
 	OBJ_FILESX = $(OBJ_FILES)
 
@@ -95,7 +101,7 @@ info:
 	@echo OS: $(OS)
 
 debug: CFLAGS+=-DDEBUG -g
-debug: all
+debug: build
 	gdb -ex "target exec $(EXECUTABLE)" -ex "run"
 
 $(BUILD_DIR)%.o: $(SRC_DIR)%.c

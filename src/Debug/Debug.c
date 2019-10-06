@@ -4,39 +4,90 @@
 #include <errno.h>
 #include <string.h>
 #include <Debug.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
+#include <signal.h>
 
-void Log(char *Message)
+static bool Opened_File;
+static FILE *f;
+
+void Clear_Debug_File(void)
 {
-    FILE *f = fopen("Debug_Log.txt", "a");
-
-    if (f)
-        fprintf(f, Message);
-    else
+    if (Opened_File)
     {
-#ifdef Linux
-        // Stop Threads
-
-        clear();
-        printf("[DEBUG]: UNABLE TO OPEN FILE.\n[DEBUG]: Last debug output: %s\n", Message);
-#endif
-#ifdef Windows
-        // Stop threads
-
-        clear();
-        printf("[DEBUG]: UNABLE TO OPEN FILE.\n[DEBUG]: Last debug output: %s\n", Message);
-#endif
+        fclose(f);
+        Opened_File = false;
     }
 
+    f = fopen("Debug_Log.txt", "w");
     fclose(f);
 }
-void Append(char *dest, char *src)
+
+void Log(const char *Message, ...)
 {
-    if (strlen(src) + strlen(dest) > sizeof(dest))
+    f = fopen("Debug_Log.txt", "a");
+    Opened_File = true;
+    fprintf(f, "[DEBUG]: ");
+    if (!f)
     {
-        debug(("Tried to append \"%s\" and \"%s\".\n\tlength of src: %d\n\tsize of dest: %d", dest, src, strlen(src), sizeof(dest)));
+        clear();
+        printf("ERROR WRITING FILE.\n");
         return;
     }
 
-    strcat(dest, src);
-    return;
+    va_list ap;
+    va_start(ap, Message);
+    vLog(Message, ap);
+    va_end(ap);
+
+    fclose(f);
+}
+
+void vLog(const char *Message, va_list ap)
+{
+    int ptr = 0;
+    while (Message[ptr])
+    {
+        switch (Message[ptr])
+        {
+        case '%':
+            ptr++;
+            switch (Message[ptr])
+            {
+            case 's':
+                fprintf(f, "%s", va_arg(ap, char *));
+                break;
+
+            case 'd':
+                fprintf(f, "%d", va_arg(ap, int));
+                break;
+
+            case 'z':
+                ptr++;
+                switch (Message[ptr])
+                {
+                case 'u':
+                    fprintf(f, "%u", va_arg(ap, size_t));
+                    break;
+
+                default:
+                    fprintf(f, "%c%c%c", '%', 'z', Message[ptr]);
+                    break;
+                }
+                break;
+            default:
+                fprintf(f, "%c%c", '%', Message[ptr]);
+                break;
+            }
+            break;
+
+        default:
+            fprintf(f, "%c", Message[ptr]);
+            break;
+        }
+        ptr++;
+    }
+    fprintf(f, "\n");
 }
