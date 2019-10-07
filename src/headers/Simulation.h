@@ -6,12 +6,20 @@
 #include <stddef.h>
 #include <Debug.h>
 #include <stdbool.h>
+#include <Windows.h>
+
+#define SOLID_OBJECT_SYMBOL '#'
+#define SOLID_OBJECT_COLOR_F FOREGROUND_BLUE
+#define SOLID_OBJECT_COLOR_B BACKGROUND_BLUE
+
+#define ORGANISM_SYMBOL '@'
+#define ORGANISM_COLOR_F FOREGROUND_GREEN
+#define ORGANISM_COLOR_B 0x0f
+
+#define UNUSED(x) (void)(x)
 
 void Signal_Handler(int n);
 void Signal_Handler_SEGMENTATION_FAULT(int n);
-
-#ifdef Windows
-#include <Windows.h>
 typedef struct Win32_Terminal_Info
 {
     HANDLE hConsoleOut;
@@ -26,10 +34,6 @@ typedef struct Win32_Terminal_Info
 
 Win32_Terminal_Info Get_Info(void);
 Win32_Terminal_Info Init(void);
-#endif
-
-#define Max_Length 1000
-#define Max_Width 1000
 
 typedef struct Area
 {
@@ -48,8 +52,13 @@ typedef struct Area
 size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Reset);
 size_t New_Default_Area(bool Construct, bool Reset);
 
+void ShutdownThreads(void);
+int GetNumThreads(void);
+int NewThread(void);
 void Init_ID(void);
 void Construct_Area(Area *a);
 void IMMEDIATE_ABORT(void);
 void Reset_Areas(bool EXIT);
+void Wait(long int milliseconds);
+
 #endif

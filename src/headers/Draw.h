@@ -5,6 +5,7 @@
 #include <Simulation.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <Windows.h>
 
 enum Object_Types
 {
@@ -19,21 +20,14 @@ typedef struct Properties
     bool Unbreakable;
 
     int type;
-
     bool filled;
-    #ifdef Windows
+
     WORD Foreground_Color;
     WORD Background_Color;
-    #endif
-    #ifdef Linux
-    int Foreground_Color;
-    int Background_Color;
-    #endif
 
     size_t x;
     size_t y;
 } Properties;
-
 
 typedef struct Object
 {
@@ -56,7 +50,7 @@ typedef struct
 void CursorPos(int x, int y);
 void PutObject(Properties o);
 void Destroy_Objects(bool EXIT);
-
+void Draw(wchar_t symbol, WORD Attribute, COORD Location);
 COORD_X GetCursorRealPos(void);
 size_t Get_Object_Num(void);
 #endif
