@@ -9,54 +9,9 @@ static Object *Objects;
 static size_t Object_Count;
 static size_t ID_ptr;
 static bool Init_Objects_;
-static Win32_Terminal_Info TI;
 
 size_t Get_Object_Num(void) { return Object_Count; }
-
-static HANDLE hConsoleOut;
-static COORD consoleSize;
-static CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-static HANDLE hRunMutex;
-static HANDLE hScreenMutex;
 static bool Initialized;
-
-Win32_Terminal_Info Get_Info(void)
-{
-    if (!Initialized)
-    {
-        TI = Init();
-        return TI;
-    }
-
-    TI.hConsoleOut = hConsoleOut;
-    TI.consoleSize = consoleSize;
-    TI.csbiInfo = csbiInfo;
-    TI.hScreenMutex = hScreenMutex;
-    TI.hRunMutex = hRunMutex;
-    return TI;
-}
-
-Win32_Terminal_Info Init(void)
-{
-    if (Initialized)
-        return Get_Info();
-
-    hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleScreenBufferInfo(hConsoleOut, &csbiInfo);
-    consoleSize.X = csbiInfo.srWindow.Right;
-    consoleSize.Y = csbiInfo.srWindow.Bottom;
-    hScreenMutex = CreateMutexW(NULL, FALSE, NULL);
-    hRunMutex = CreateMutexW(NULL, TRUE, NULL);
-
-    Initialized = true;
-
-    TI.hConsoleOut = hConsoleOut;
-    TI.consoleSize = consoleSize;
-    TI.csbiInfo = csbiInfo;
-    TI.hScreenMutex = hScreenMutex;
-    TI.hRunMutex = hRunMutex;
-    return TI;
-}
 
 void Destroy_Objects(bool EXIT)
 {
@@ -83,10 +38,9 @@ void Destroy_Objects(bool EXIT)
 void CursorPos(int x, int y)
 {
 
-    TI = Init();
     COORD ToPos = {(SHORT)x, (SHORT)y};
 
-    SetConsoleCursorPosition(TI.hConsoleOut, ToPos);
+    SetConsoleCursorPosition(GethConsoleOut(), ToPos);
 }
 
 COORD_X GetCursorRealPos(void)
@@ -154,10 +108,9 @@ void PutObject(Properties o)
 void Draw(wchar_t symbol, WORD Attribute, COORD Location)
 {
     DWORD Dum;
-    TI = Get_Info();
 
-    WaitForSingleObject(TI.hScreenMutex, INFINITE);
-    WriteConsoleOutputCharacterW(TI.hConsoleOut, &symbol, 1, Location, &Dum);
-    WriteConsoleOutputAttribute(TI.hConsoleOut, &Attribute, 1, Location, &Dum);
-    ReleaseMutex(TI.hScreenMutex);
+    WaitForSingleObject(GethScreenMutex(), INFINITE);
+    WriteConsoleOutputCharacterW(GethConsoleOut(), &symbol, 1, Location, &Dum);
+    WriteConsoleOutputAttribute(GethConsoleOut(), &Attribute, 1, Location, &Dum);
+    ReleaseMutex(GethScreenMutex());
 }

@@ -88,7 +88,7 @@ endif
 .SUFFIX: .c .o
 .PRECIOUS: $(SRC_FILES) $(HEADER_FILES)
 
-build: clean $(OBJ_FILESX)
+build: $(OBJ_FILESX)
 	$(CC) $(CFLAGS) $(OBJ_FILESX) -o $(EXECUTABLE)
 
 info:

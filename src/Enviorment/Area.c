@@ -15,19 +15,27 @@ void Reset_Areas(bool EXIT)
     debug(("Resetting Areas..."));
 
     Area *x;
+    while (Areas->prev)
+    {
+        x = Areas->prev;
+        Areas = x;
+    }
     while (Areas->next)
     {
-        debug(("ok"));
         x = Areas->next;
         free(Areas);
+        debug(("Destroyed Area: %d", ID_ptr));
         Areas = x;
+        ID_ptr--;
     }
 
     if (EXIT)
     {
         free(Areas);
+        debug(("Destroyed Area: %d", ID_ptr));
     }
 
+    Init_ID();
     debug(("Resetted Areas."));
 }
 
@@ -42,6 +50,9 @@ size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Re
         x = Areas;
         Areas = Areas->next;
     }
+
+    ID_ptr++;
+
     Areas = malloc(sizeof *Areas);
     Areas->prev = x;
     Areas->next = NULL;
@@ -54,41 +65,13 @@ size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Re
 
     if (Construct)
         Construct_Area(Areas);
-
-    ID_ptr++;
     return Areas->ID;
 }
 
 size_t New_Default_Area(bool Construct, bool Reset)
 {
-    Win32_Terminal_Info TI = Get_Info();
-    // There's a better way to do this
-
-    if (Reset)
-        Reset_Areas(false);
-
-    Area *x = Areas;
-    while (Areas)
-    {
-        x = Areas;
-        Areas = Areas->next;
-    }
-
-    Areas = malloc(sizeof *Areas);
-    Areas->prev = x;
-    Areas->next = NULL;
-
-    Areas->Total_Animal_Population = 0;
-    Areas->Total_Organism_Population = 0;
-    Areas->Length = (size_t)TI.consoleSize.X - 1;
-    Areas->Width = (size_t)TI.consoleSize.Y - 1;
-    Areas->ID = ID_ptr;
-
-    debug(("New Area ID: %zu", Areas->ID));
-
-    ID_ptr++;
-    if (Construct)
-        Construct_Area(Areas);
+    COORD x=GetconsoleSize();
+    New_Area((size_t)x.X - 1, (size_t)x.Y - 1, Construct, Reset);
     return Areas->ID;
 }
 

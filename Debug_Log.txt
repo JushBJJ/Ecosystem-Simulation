@@ -1,19 +1,21 @@
 [DEBUG]: DEBUG MODE
-[DEBUG]: New Area ID: 0
 [DEBUG]: Constructing Area...
 [DEBUG]: Building objects...
 [DEBUG]: Initialized Objects
-[DEBUG]: Finshed constructing Area 0.
-[DEBUG]: Organism POS: (10,10)
+[DEBUG]: Finshed constructing Area 1.
 [DEBUG]: Initialized Organisms
-[DEBUG]: New Thread started.
-[DEBUG]: Organism POS: (10,10)
-[DEBUG]: Shutting Down threads..
+[DEBUG]: Thread Organism ID: 1
+[DEBUG]: Thread Organism ID: 2
+[DEBUG]: Thread Organism ID: 3
 [DEBUG]: Destroying Objects.
 [DEBUG]: Destroyed Objects
 [DEBUG]: Destroying Organisms...
-[DEBUG]: Destroying Organism ID: 0
+[DEBUG]: Destroying Organism ID: 1
+[DEBUG]: Destroying Organism ID: 2
+[DEBUG]: Destroying Organism ID: 3
 [DEBUG]: Destroyed Organisms
 [DEBUG]: Resetting Areas...
+[DEBUG]: Destroyed Area: 1
 [DEBUG]: Resetted Areas.
-[DEBUG]: PROGRAM EXIT.
+[DEBUG]: Shutting Down threads..
+[DEBUG]: EXIT NUM: 2

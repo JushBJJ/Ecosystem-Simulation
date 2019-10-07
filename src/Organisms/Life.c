@@ -4,11 +4,19 @@
 #include <stdio.h>
 #include <Draw.h>
 #include <Life.h>
+#include <stdbool.h>
 #include <time.h>
+#include <process.h>
+#include <conio.h>
 
 size_t GetBlacklist(wchar_t Cell);
-static Organism *LocalOrganism;
-static Win32_Terminal_Info TI;
+Organism *LocalOrganism;
+COORD Next_Coord;
+DWORD Dum;
+wchar_t Next_Cell;
+wchar_t Blank_Cell = 0x20;
+wchar_t Sym = ORGANISM_SYMBOL;
+wchar_t Attr = ORGANISM_COLOR_F;
 
 size_t GetBlacklist(wchar_t Cell)
 {
@@ -35,24 +43,21 @@ void Wait(long int milliseconds)
     } while (msec < milliseconds);
 }
 
-void Move(Direction d)
+void Move(Direction d, size_t ID)
 {
     /*
         Simple rule:
         If the direction ahead of it (by 1) is occupied
         then consume it or leave it unless if it's a solid object
     */
-
-    COORD Next_Coord = LocalOrganism->CURRENT;
-    DWORD Dum;
-    wchar_t Next_Cell;
-    wchar_t Blank_Cell = 0x0f;
-    wchar_t Sym = ORGANISM_SYMBOL;
+    Organism *o = GetOrganism(ID);
+    LocalOrganism = o;
+    Next_Coord = o->CURRENT;
 
     switch (d)
     {
     case DOWN:
-        Next_Coord.Y--;
+        Next_Coord.Y++;
         break;
     case LEFT:
         Next_Coord.X--;
@@ -61,42 +66,37 @@ void Move(Direction d)
         Next_Coord.X++;
         break;
     case UP:
-        Next_Coord.Y++;
+        Next_Coord.Y--;
         break;
     }
-
-    WaitForSingleObject(TI.hScreenMutex, INFINITE);
-    ReadConsoleOutputCharacterW(TI.hConsoleOut, &Next_Cell, 1, Next_Coord, &Dum);
+    ReadConsoleOutputCharacterW(GethConsoleOut(), &Next_Cell, 1, Next_Coord, &Dum);
 
     switch (Next_Cell)
     {
-    case ' ':
-        WriteConsoleOutputCharacterW(TI.hConsoleOut, &Blank_Cell, 1, LocalOrganism->CURRENT, &Dum);
-        WriteConsoleOutputAttribute(TI.hConsoleOut, 0, 1, LocalOrganism->CURRENT, &Dum);
+    case Normal:
+        WriteConsoleOutputCharacterW(GethConsoleOut(), &Blank_Cell, 1, LocalOrganism->CURRENT, &Dum);
+        WriteConsoleOutputAttribute(GethConsoleOut(), 0, 1, LocalOrganism->CURRENT, &Dum);
 
         LocalOrganism->CURRENT = Next_Coord;
-        WriteConsoleOutputAttribute(TI.hConsoleOut, &Blank_Cell, 1, Next_Coord, &Dum);
-        WriteConsoleOutputCharacterW(TI.hConsoleOut, &Sym, 1, Next_Coord, &Dum);
+        WriteConsoleOutputCharacterW(GethConsoleOut(), &Sym, 1, Next_Coord, &Dum);
+        WriteConsoleOutputAttribute(GethConsoleOut(), &Attr, 1, Next_Coord, &Dum);
         break;
     }
-    ReleaseMutex(TI.hScreenMutex);
-
-    Wait(500);
+    ReleaseMutex(GethScreenMutex());
+    UpdateOrganism(LocalOrganism);
 }
 
-void Alive(void *o)
+void Alive(void *x)
 {
-    UNUSED(o);
-    LocalOrganism = Get_Organsisms();
-    TI = Get_Info();
+    size_t ID;
+    ID = (size_t)x;
+    debug(("Thread Organism ID: %d", ID));
+    LocalOrganism = GetOrganism(ID);
 
-    Draw(ORGANISM_SYMBOL, LocalOrganism->Properties.Color, LocalOrganism->CURRENT);
-    debug(("New Thread started."));
-    // Neural Network?
-
-    debug(("Organism POS: (%d,%d)", LocalOrganism->CURRENT.X, LocalOrganism->CURRENT.Y));
-    while (WaitForSingleObject(TI.hRunMutex, 75L) == WAIT_TIMEOUT)
+    do
     {
-        Move(RIGHT);
-    }
+        WaitForSingleObject(GethScreenMutex(), INFINITE);
+        Move(RIGHT, ID);
+        Wait(300);
+    } while (WaitForSingleObject(GethRunMutex(), 75L) == WAIT_TIMEOUT);
 }

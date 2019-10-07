@@ -7,7 +7,8 @@
 #include <stdbool.h>
 #include <Windows.h>
 
-typedef struct Organism_p{
+typedef struct Organism_p
+{
 
     size_t speed; // Measured at Cells Per Second
     size_t health;
@@ -18,26 +19,35 @@ typedef struct Organism_p{
     size_t Current_Hunger;
     size_t Current_Thrist;
 
-    WORD Color;
-}Organism_p;
+    COORD BIRTH_POINT;
 
-typedef struct Organism{
+    WORD Color;
+} Organism_p;
+
+typedef struct Organism
+{
     size_t ID;
     Organism_p Properties;
 
     size_t Children;
     size_t Age;
     bool Ready_To_Breed;
-    
+
     COORD CURRENT;
+
+    bool Locked;
+    bool Wrong;
 
     struct Organism *next;
     struct Organism *prev;
-}Organism;
+} Organism;
 
-Organism *Get_Organsisms(void);
+Organism *Get_Organisms(void);
+Organism *GetOrganism(size_t ID);
+Organism *LockOrganism(size_t ID);
 void Destroy_Organisms(bool EXIT);
-void Create_Organism(Organism_p p);
-void Alive(void *o);
+size_t Create_Organism(Organism_p p);
+void UpdateOrganism(Organism *o);
+void Alive(void *x);
 
 #endif
