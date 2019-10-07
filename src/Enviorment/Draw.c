@@ -3,9 +3,7 @@
 #include <Simulation.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef Windows
 #include <Windows.h>
-#endif
 
 static Object *Objects;
 static size_t Object_Count;
@@ -15,7 +13,6 @@ static Win32_Terminal_Info TI;
 
 size_t Get_Object_Num(void) { return Object_Count; }
 
-#ifdef Windows
 static HANDLE hConsoleOut;
 static COORD consoleSize;
 static CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
@@ -60,7 +57,6 @@ Win32_Terminal_Info Init(void)
     TI.hRunMutex = hRunMutex;
     return TI;
 }
-#endif
 
 void Destroy_Objects(bool EXIT)
 {
@@ -86,22 +82,17 @@ void Destroy_Objects(bool EXIT)
 
 void CursorPos(int x, int y)
 {
-#ifdef Windows
+
     TI = Init();
     COORD ToPos = {(SHORT)x, (SHORT)y};
 
     SetConsoleCursorPosition(TI.hConsoleOut, ToPos);
-#endif
-
-#ifdef Linux
-    printf("\033[%d;%dH", x, y);
-#endif
 }
 
 COORD_X GetCursorRealPos(void)
 {
     COORD_X c;
-#ifdef Windows
+
     POINT pt;
 
     GetCursorPos(&pt);
@@ -109,12 +100,11 @@ COORD_X GetCursorRealPos(void)
     c.y = pt.y;
 
     return c;
-#endif
-#ifdef Linux
+
     // NEEDED
 
     return c;
-#endif
+
     c.x = -1;
     c.y = -1;
 
@@ -152,23 +142,22 @@ void PutObject(Properties o)
 
     Object_Count++;
 
-// Drawing
-#ifdef Windows
-    COORD f;
-    TI = Get_Info();
-    wchar_t Current_Cell = '#';
-    WORD Current_Attr = o.Foreground_Color + o.Background_Color;
-    DWORD Dum;
+    // Drawing
 
+    COORD f;
     f.X = (SHORT)Objects->x;
     f.Y = (SHORT)Objects->y;
 
-    WaitForSingleObject(TI.hScreenMutex, INFINITE);
-    WriteConsoleOutputCharacterW(TI.hConsoleOut, &Current_Cell, 1, f, &Dum);
-    WriteConsoleOutputAttribute(TI.hConsoleOut, &Current_Attr, 1, f, &Dum);
-    ReleaseMutex(TI.hScreenMutex);
-#endif
-#ifdef Linux
+    Draw('#', (WORD)(o.Foreground_Color + o.Background_Color), f);
+}
 
-#endif
+void Draw(wchar_t symbol, WORD Attribute, COORD Location)
+{
+    DWORD Dum;
+    TI = Get_Info();
+
+    WaitForSingleObject(TI.hScreenMutex, INFINITE);
+    WriteConsoleOutputCharacterW(TI.hConsoleOut, &symbol, 1, Location, &Dum);
+    WriteConsoleOutputAttribute(TI.hConsoleOut, &Attribute, 1, Location, &Dum);
+    ReleaseMutex(TI.hScreenMutex);
 }

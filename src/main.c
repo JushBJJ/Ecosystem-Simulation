@@ -1,58 +1,81 @@
 #include <stdio.h>
 #include <Simulation.h>
+#include <Organisms.h>
 #include <Draw.h>
 #include <Debug.h>
 #include <ctype.h>
 #include <signal.h>
-#ifdef Windows
 #include <conio.h>
-#endif
 
 static int Key;
+static int ThreadPtr;
+static Win32_Terminal_Info TI;
+
+int GetNumThreads(void) { return ThreadPtr; }
+int NewThread(void)
+{
+    ThreadPtr++;
+    return ThreadPtr;
+}
 
 int main(void)
 {
+    Organism_p p;
+
     Clear_Debug_File();
     debug(("DEBUG MODE"));
     signal(SIGINT, Signal_Handler);
     signal(SIGSEGV, Signal_Handler_SEGMENTATION_FAULT);
-
-#ifdef Windows
     Init();
-#endif
 
     Init_ID();
     New_Default_Area(true, false);
 
-#ifdef Windows
+    p.Color = ORGANISM_COLOR_F + ORGANISM_COLOR_B;
+    p.Current_Hunger = 100;
+    p.Current_Thrist = 100;
+    p.Max_Hunger = 100;
+    p.Max_Thirst = 100;
+    p.speed = 1;
+
+    Create_Organism(p);
+
     while (tolower(Key) != 'q')
         Key = _getch();
-#endif
 
     raise(2);
     return 0;
 }
 
+void ShutdownThreads(void)
+{
+    debug(("Shutting Down threads.."));
+    TI = Init();
+
+    while (ThreadPtr > 0)
+    {
+        ReleaseMutex(TI.hRunMutex);
+        ThreadPtr--;
+    }
+
+    WaitForSingleObject(TI.hScreenMutex, INFINITE);
+}
+
 void Signal_Handler(int n)
 {
+    ShutdownThreads();
     Destroy_Objects(true);
+    Destroy_Organisms(true);
     Reset_Areas(true);
 
     clear();
+    clear();
     debug(("PROGRAM EXIT."));
-    printf("SIGNAL: %d\n", n);
     exit(0);
 }
 
 void Signal_Handler_SEGMENTATION_FAULT(int n)
 {
-    clear();
-
-    printf("Uh oh, SEGMENTATION FAULT AHAHHAHHA\n");
-    printf("Num: %d\n", n);
-    debug(("Segmentation Fault. Num: %d", n));
-
-    Destroy_Objects(true);
-    Reset_Areas(true);
+    Signal_Handler(n);
     exit(0);
 }

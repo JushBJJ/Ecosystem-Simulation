@@ -14,6 +14,7 @@ CFLAGS:=\
 	-Wno-long-long \
 	-Wconversion\
 	-Wstrict-prototypes\
+	-DDEBUG\
 
 Executable_Name = Simulation
 

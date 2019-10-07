@@ -12,6 +12,14 @@
 
 static bool Opened_File;
 static FILE *f;
+void clear(void)
+{
+    Win32_Terminal_Info TI_C = Get_Info();
+    DWORD dummy = 0;
+    COORD Start = {0, 0};
+    FillConsoleOutputCharacterW(TI_C.hConsoleOut, L' ', (DWORD)(TI_C.consoleSize.X * TI_C.consoleSize.Y+1), Start, &dummy);
+    FillConsoleOutputAttribute(TI_C.hConsoleOut, 0x0f, (DWORD)(TI_C.consoleSize.X * TI_C.consoleSize.Y+1), Start, &dummy);
+}
 
 void Clear_Debug_File(void)
 {

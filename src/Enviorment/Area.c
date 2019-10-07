@@ -95,7 +95,7 @@ size_t New_Default_Area(bool Construct, bool Reset)
 void Construct_Area(Area *a)
 {
     debug(("Constructing Area..."));
-#ifdef Windows
+
     clear();
 
     Properties o;
@@ -104,8 +104,8 @@ void Construct_Area(Area *a)
     o.Unbreakable = true;
     o.type = Solid_t;
     o.filled = true;
-    o.Foreground_Color = FOREGROUND_BLUE;
-    o.Background_Color = BACKGROUND_BLUE;
+    o.Foreground_Color = SOLID_OBJECT_COLOR_F;
+    o.Background_Color = SOLID_OBJECT_COLOR_B;
     o.x = 0;
     o.y = 0;
 
@@ -132,5 +132,4 @@ void Construct_Area(Area *a)
     }
 
     debug(("Finshed constructing Area %zu.", a->ID));
-#endif
 }
