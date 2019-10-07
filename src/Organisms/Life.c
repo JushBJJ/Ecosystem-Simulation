@@ -93,6 +93,7 @@ void Alive(void *x)
     debug(("Thread Organism ID: %d", ID));
     LocalOrganism = GetOrganism(ID);
 
+    // replace this with a neural network
     do
     {
         WaitForSingleObject(GethScreenMutex(), INFINITE);
