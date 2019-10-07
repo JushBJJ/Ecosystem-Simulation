@@ -14,11 +14,14 @@ static bool Opened_File;
 static FILE *f;
 void clear(void)
 {
-    Win32_Terminal_Info TI_C = Get_Info();
     DWORD dummy = 0;
     COORD Start = {0, 0};
-    FillConsoleOutputCharacterW(TI_C.hConsoleOut, L' ', (DWORD)(TI_C.consoleSize.X * TI_C.consoleSize.Y+1), Start, &dummy);
-    FillConsoleOutputAttribute(TI_C.hConsoleOut, 0x0f, (DWORD)(TI_C.consoleSize.X * TI_C.consoleSize.Y+1), Start, &dummy);
+    COORD x=GetconsoleSize();
+
+    ClearBar();
+
+    FillConsoleOutputCharacterW(GethConsoleOut(), L' ', (DWORD)(x.X * x.Y + 1), Start, &dummy);
+    FillConsoleOutputAttribute(GethConsoleOut(), 0x0f, (DWORD)(x.X * x.Y + 1), Start, &dummy);
 }
 
 void Clear_Debug_File(void)
@@ -31,6 +34,15 @@ void Clear_Debug_File(void)
 
     f = fopen("Debug_Log.txt", "w");
     fclose(f);
+}
+
+void ClearBar(void)
+{
+    COORD x=GetconsoleSize();
+    DWORD dummy = 0;
+    COORD Start = {0, x.Y};
+
+    FillConsoleOutputCharacterW(GethConsoleOut(), L'\0', (DWORD)(x.X * 1), Start, &dummy);
 }
 
 void Log(const char *Message, ...)

@@ -8,16 +8,82 @@
 
 static Organism *Organisms;
 static bool Init_Organisms_;
-static int Organisms_Count;
+static size_t Organisms_Count;
 static size_t idptr;
-static Win32_Terminal_Info TI;
 
-Organism *Get_Organsisms(void) { return Organisms; }
+Organism *Get_Organisms(void) { return Organisms; }
+void UpdateOrganism(Organism *o)
+{
+    Organism *x;
+    while (Organisms->prev)
+    {
+        x = Organisms->prev;
+        Organisms = x;
+    }
+    while (Organisms->next)
+    {
+        x = Organisms->next;
+        if (Organisms->ID == o->ID)
+            break;
+        Organisms = x;
+    }
+
+    Organisms = o;
+}
+
+Organism *GetOrganism(size_t ID)
+{
+    Organism *x;
+    while (Organisms->prev)
+    {
+        x = Organisms->prev;
+        Organisms = x;
+    }
+    while (Organisms->next)
+    {
+        x = Organisms->next;
+        if (Organisms->ID == ID)
+            break;
+        Organisms = x;
+    }
+    return Organisms;
+}
+
+Organism *LockOrganism(size_t ID)
+{
+    Organism *x;
+
+    while (Organisms->prev)
+    {
+        x = Organisms->prev;
+        Organisms = x;
+    }
+
+    while (Organisms->next)
+    {
+        x = Organisms->next;
+        if (Organisms->ID == ID)
+            break;
+        Organisms = x;
+    }
+
+    if (Organisms->Locked == true)
+        Organisms->Wrong = true;
+    else
+        Organisms->Locked = true;
+    return Organisms;
+}
 
 void Destroy_Organisms(bool EXIT)
 {
     debug(("Destroying Organisms..."));
     Organism *x;
+
+    while (Organisms->prev)
+    {
+        x = Organisms->prev;
+        Organisms = x;
+    }
 
     while (Organisms->next)
     {
@@ -35,7 +101,7 @@ void Destroy_Organisms(bool EXIT)
     debug(("Destroyed Organisms"));
 }
 
-void Create_Organism(Organism_p p)
+size_t Create_Organism(Organism_p p)
 {
     Organism *x;
 
@@ -43,22 +109,26 @@ void Create_Organism(Organism_p p)
     {
         Organisms = NULL;
         x = NULL;
-        TI = Init();
 
         Organisms = malloc(sizeof *Organisms);
-        Organisms->CURRENT.X = 10;
-        Organisms->CURRENT.Y = 10;
         Organisms->next = NULL;
-
         Init_Organisms_ = true;
-        debug(("Organism POS: (%d,%d)", Organisms->CURRENT.X, Organisms->CURRENT.Y));
         debug(("Initialized Organisms"));
     }
+    while (Organisms->prev)
+    {
+        x = Organisms->prev;
+        Organisms = x;
+    }
+
     while (Organisms->next)
     {
         x = Organisms;
         Organisms = Organisms->next;
     }
+
+    idptr++;
+    Organisms_Count++;
 
     Organisms->ID = idptr;
     Organisms->Properties = p;
@@ -68,12 +138,7 @@ void Create_Organism(Organism_p p)
     Organisms->next = malloc(sizeof *Organisms);
     Organisms->prev = x;
     Organisms->Properties.Color = ORGANISM_COLOR_F;
+    Organisms->CURRENT = Organisms->Properties.BIRTH_POINT;
 
-    idptr++;
-    Organisms_Count++;
-
-    x = Organisms;
-
-    NewThread();
-    _beginthread(Alive, 0, &x);
+    return Organisms->ID;
 }
