@@ -8,7 +8,6 @@
 [DEBUG]: Thread Organism ID: 2
 [DEBUG]: Thread Organism ID: 3
 [DEBUG]: Thread Organism ID: 4
-[DEBUG]: Thread Organism ID: 5
 [DEBUG]: Destroying Objects.
 [DEBUG]: Destroyed Objects
 [DEBUG]: Destroying Organisms...
@@ -16,7 +15,6 @@
 [DEBUG]: Destroying Organism ID: 2
 [DEBUG]: Destroying Organism ID: 3
 [DEBUG]: Destroying Organism ID: 4
-[DEBUG]: Destroying Organism ID: 5
 [DEBUG]: Destroyed Organisms
 [DEBUG]: Resetting Areas...
 [DEBUG]: Destroyed Area: 1
