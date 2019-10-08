@@ -103,6 +103,12 @@ void ShutdownThreads(void)
 
 void Signal_Handler(int n)
 {
+    ShutdownThreads();
+    clear();
+    Destroy_Objects(true);
+    Destroy_Organisms(true);
+    Reset_Areas(true);
+
     if (hScreenMutex)
         CloseHandle(hScreenMutex);
     if (hRunMutex)
@@ -110,13 +116,6 @@ void Signal_Handler(int n)
     if (hConsoleOut)
         CloseHandle(hConsoleOut);
 
-    Destroy_Objects(true);
-    Destroy_Organisms(true);
-    Reset_Areas(true);
-    ShutdownThreads();
-
-    ClearBar();
-    clear();
     debug(("EXIT NUM: %d", n));
     exit(0);
 }

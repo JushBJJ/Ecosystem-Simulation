@@ -1,6 +1,7 @@
 #ifndef LIFE_H
 #define LIFE_H
 #include <Windows.h>
+#include <Simulation.h>
 
 typedef int Direction;
 enum Directions
