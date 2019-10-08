@@ -123,8 +123,8 @@ size_t Create_Organism(Organism_p p)
 
     while (Organisms->next)
     {
-        x = Organisms;
-        Organisms = Organisms->next;
+        x = Organisms->next;
+        Organisms = x;
     }
 
     idptr++;

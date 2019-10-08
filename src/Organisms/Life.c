@@ -69,6 +69,7 @@ void Move(Direction d, size_t ID)
         Next_Coord.Y--;
         break;
     }
+    
     ReadConsoleOutputCharacterW(GethConsoleOut(), &Next_Cell, 1, Next_Coord, &Dum);
 
     switch (Next_Cell)
