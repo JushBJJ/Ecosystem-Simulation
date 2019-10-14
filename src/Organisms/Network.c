@@ -67,8 +67,8 @@ void Forward(NeuralNetwork *LocalNN)
     float HiddenNode[Hidden_Node_Array_Size]; // Hidden Nodes
     float OutputNode[Output_Node_Array_Size]; // Output Nodes
     float last_value = 0;
-    float Bias1 = getrandom(-1, 1);
-    float Bias2 = getrandom(-1,1);
+    float Bias1 = getrandom(0, 100);
+    float Bias2 = getrandom(0,100);
     int Selected_Output_Node = 8;
 
     for (size_t x = 0; x <= Hidden_Node_Array_Size; x++)
@@ -81,7 +81,7 @@ void Forward(NeuralNetwork *LocalNN)
         for (; j <= Hidden_Node_Array_Size; j++)
         {
             if (LocalNN->INN[z].Synapse_Weight[j] <= 0)
-                LocalNN->INN[z].Synapse_Weight[j] = getrandom(-1, 1);
+                LocalNN->INN[z].Synapse_Weight[j] = getrandom(0, 100);
         }
         j = 0;
     }
