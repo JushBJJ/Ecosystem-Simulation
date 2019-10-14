@@ -10,7 +10,6 @@
 #include <conio.h>
 #include <NeuralNetwork.h>
 
-size_t GetBlacklist(wchar_t Cell);
 Organism *LocalOrganism;
 COORD Next_Coord;
 DWORD Dum;
@@ -18,18 +17,6 @@ wchar_t Next_Cell;
 wchar_t Blank_Cell = 0x20;
 wchar_t Sym = ORGANISM_SYMBOL;
 wchar_t Attr = ORGANISM_COLOR_F;
-
-size_t GetBlacklist(wchar_t Cell)
-{
-    wchar_t Blacklisted[] = {SOLID_OBJECT_SYMBOL};
-
-    for (size_t i = 0; i < sizeof(Blacklisted); i++)
-    {
-        if (Cell == Blacklisted[i])
-            return i;
-    }
-    return Normal;
-}
 
 void Wait(long int milliseconds)
 {
@@ -88,8 +75,6 @@ void Move(Direction d, size_t ID)
         Next_Coord.X++;
         break;
     }
-
-    //printf("Direction: %d", d);
 
     ReadConsoleOutputCharacterW(GethConsoleOut(), &Next_Cell, 1, Next_Coord, &Dum);
 
