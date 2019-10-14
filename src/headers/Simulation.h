@@ -45,6 +45,7 @@ void Construct_Area(Area *a);
 void IMMEDIATE_ABORT(void);
 void Reset_Areas(bool EXIT);
 void Wait(long int milliseconds);
+int GetSeedPtr(void);
 
 int GetNumThreads(void);
 HANDLE GethConsoleOut(void);

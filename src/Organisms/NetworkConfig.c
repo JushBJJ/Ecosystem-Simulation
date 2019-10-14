@@ -4,108 +4,88 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
 static NeuralNetwork *NNS;
-static size_t idptr;
-static bool initNN;
 
 NeuralNetwork *GetNN(size_t ID)
 {
-    NeuralNetwork *x;
-    while (NNS->prev)
-    {
-        x = NNS->prev;
-        NNS = x;
-    }
-    while (NNS->next)
-    {
-        if (NNS->ID == ID)
-            return ID;
-        x = NNS->next;
-        NNS = x;
-    }
+    if (NNS + ID)
+        return (NNS + ID);
 
-    if (NNS->ID != ID)
-        return 0;
+    return (NeuralNetwork *)0x00;
 }
 
 void UpdateNeuralNetwork(NeuralNetwork *N)
 {
-    NeuralNetwork *x;
-
-    while (NNS->prev)
-    {
-        x = NNS->prev;
-        NNS = x;
-    }
-    while (NNS->next)
-    {
-        x = NNS->next;
-        if (NNS->ID == N->ID)
-        {
-            NNS = N;
-            return;
-        }
-        NNS = x;
-    }
-
-    debug(("ERROR: COULDN'T UPDATE NEURALNETWORK %d", N->ID));
+    if (NNS + N->ID)
+        memcpy(NNS + N->ID, N, sizeof(NeuralNetwork));
+    else
+        Log("UNABLE TO UPDATE NEURAL NETWORK ID %d\n", N->ID);
 }
 
 void Destroy_NNS(bool EXIT)
 {
-    debug(("Destroying Neural Networks..."));
-    NeuralNetwork *x;
+    size_t ptr = 1;
 
-    while (NNS->prev)
+    while ((NNS + ptr))
     {
-        x = NNS->prev;
-        NNS = x;
-    }
-    while (NNS->next)
-    {
-        debug(("Destroyed Neural Network %d", NNS->ID));
-        x = NNS->next;
-        free(NNS);
-        NNS = x;
+        for (size_t i = 0; i <= sizeof((NNS + ptr)->HNN) / sizeof((NNS + ptr)->HNN[0]); i++)
+            free((NNS + ptr)->HNN[i].Synapse_Weight);
+        for (size_t i = 0; i <= sizeof(NNS->INN) / sizeof(NNS->INN[0]); i++)
+            free((NNS + ptr)->INN[i].Synapse_Weight);
+
+        free((NNS + ptr));
+        ptr++;
     }
 
     if (EXIT)
-        free(NNS);
+        free((NNS + 0));
     else
-        NNS = NULL;
-
-    debug(("Destroyed Neural Networks."));
+        memset((NNS + 0), 0, sizeof(NeuralNetwork));
 }
 
-NeuralNetwork *NewNN(void)
+NeuralNetwork *NewNN(size_t Organism_ID)
 {
-    NeuralNetwork *x;
+    NeuralNetwork *x = NULL;
+    size_t ptr = Organism_ID;
 
-    if (!initNN)
+    x = GetNN(Organism_ID);
+
+    if (x)
+        return x;
+
+    if (ptr == 0)
+        NNS = (NeuralNetwork *)malloc(sizeof(NeuralNetwork));
+
+    (NNS + ptr)->next = (NeuralNetwork *)malloc(sizeof(NeuralNetwork));
+    (NNS + ptr)->ID = Organism_ID;
+    (NNS + ptr)->Fitness = 0;
+
+    srand((size_t)time(NULL));
+
+    for (size_t j = 0, z = 0; j <= sizeof((NNS + ptr)->INN) / sizeof((NNS + ptr)->INN[0]); j++)
     {
-        NNS = NULL;
-        x = NULL;
-
-        NNS = malloc(sizeof *NNS);
-        NNS->next = NULL;
-        initNN = true;
-        debug(("Initialized Neural Network"));
+        (NNS + ptr)->INN[j].Synapse_Weight = calloc(defaultHiddenLayerSize - 1, sizeof(float) + 10);
+        while (z <= defaultHiddenLayerSize - 1)
+        {
+            (NNS + ptr)->INN[j].Synapse_Weight[z] = getrandom(-1, 1);
+            z++;
+        }
+        z = 0;
+    }
+    for (size_t j = 0, z = 0; j <= sizeof((NNS + ptr)->HNN) / sizeof((NNS + ptr)->HNN[0]); j++)
+    {
+        (NNS + ptr)->HNN[j].Synapse_Weight = calloc(defaultOutputLayerSize - 1, sizeof(float) + 10);
+        while (z <= defaultInputLayerSize - 1)
+        {
+            (NNS + ptr)->HNN[j].Synapse_Weight[z] = getrandom(-1, 1);
+            z++;
+        }
+        z = 0;
     }
 
-    while (NNS->next)
-    {
-        x = NNS->next;
-        x->prev = NNS;
-        NNS = x;
-    }
-
-    idptr++;
-    NNS->ID = idptr;
-    NNS->TotalPoints = 0;
-    NNS->next = malloc(sizeof *NNS);
-    for (int i = 0; i <= 8; i++)
-        NNS->Range[i] = 0;
-
-    return NNS;
+    (NNS + ptr)->Made = true;
+    return (NNS + ptr);
 }

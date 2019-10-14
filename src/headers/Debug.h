@@ -5,13 +5,13 @@
 #include <Simulation.h>
 
 void Log(const char *Message, ...);
-void vLog(const char *Message, va_list ap);
-void Clear_Debug_File(void);
+//void vLog(const char *Message, va_list ap);
+//void Clear_Debug_File(void);
 void clear(void);
 void ClearBar(void);
 
 #ifdef DEBUG
-#define debug(x) Log x
+#define debug Log
 #else
 #define debug(x) \
     do           \

@@ -35,16 +35,12 @@ typedef struct Organism
 
     COORD CURRENT;
 
-    bool Locked;
-    bool Wrong;
-
     struct Organism *next;
     struct Organism *prev;
 } Organism;
 
 Organism *Get_Organisms(void);
 Organism *GetOrganism(size_t ID);
-Organism *LockOrganism(size_t ID);
 void Destroy_Organisms(bool EXIT);
 size_t Create_Organism(Organism_p p);
 void UpdateOrganism(Organism *o);

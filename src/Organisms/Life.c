@@ -8,6 +8,7 @@
 #include <time.h>
 #include <process.h>
 #include <conio.h>
+#include <NeuralNetwork.h>
 
 size_t GetBlacklist(wchar_t Cell);
 Organism *LocalOrganism;
@@ -51,6 +52,8 @@ void Move(Direction d, size_t ID)
         then consume it or leave it unless if it's a solid object
     */
     Organism *o = GetOrganism(ID);
+    NeuralNetwork *NN = GetNN(ID);
+
     LocalOrganism = o;
     Next_Coord = o->CURRENT;
 
@@ -68,19 +71,40 @@ void Move(Direction d, size_t ID)
     case UP:
         Next_Coord.Y--;
         break;
+    case UPLEFT:
+        Next_Coord.Y--;
+        Next_Coord.X--;
+        break;
+    case UPRIGHT:
+        Next_Coord.Y--;
+        Next_Coord.X++;
+        break;
+    case DOWNLEFT:
+        Next_Coord.Y++;
+        Next_Coord.X--;
+        break;
+    case DOWNRIGHT:
+        Next_Coord.Y++;
+        Next_Coord.X++;
+        break;
     }
-    
+
+    //printf("Direction: %d", d);
+
     ReadConsoleOutputCharacterW(GethConsoleOut(), &Next_Cell, 1, Next_Coord, &Dum);
 
     switch (Next_Cell)
     {
     case Normal:
+        NN->Fitness += 100;
         WriteConsoleOutputCharacterW(GethConsoleOut(), &Blank_Cell, 1, LocalOrganism->CURRENT, &Dum);
         WriteConsoleOutputAttribute(GethConsoleOut(), 0, 1, LocalOrganism->CURRENT, &Dum);
 
         LocalOrganism->CURRENT = Next_Coord;
         WriteConsoleOutputCharacterW(GethConsoleOut(), &Sym, 1, Next_Coord, &Dum);
         WriteConsoleOutputAttribute(GethConsoleOut(), &Attr, 1, Next_Coord, &Dum);
+        break;
+    default:
         break;
     }
     ReleaseMutex(GethScreenMutex());
@@ -89,16 +113,15 @@ void Move(Direction d, size_t ID)
 
 void Alive(void *x)
 {
-    size_t ID;
-    ID = (size_t)x;
-    debug(("Thread Organism ID: %d", ID));
-    LocalOrganism = GetOrganism(ID);
+    size_t ID = (size_t)x;
 
-    // replace this with a neural network
+    LocalOrganism = GetOrganism(ID);
+    NeuralNetwork *LocalNN = NewNN(ID);
+
     do
     {
         WaitForSingleObject(GethScreenMutex(), INFINITE);
-        Move(RIGHT, ID);
-        Wait(300);
+        NN(LocalOrganism, LocalNN);
+        Forward(LocalNN);
     } while (WaitForSingleObject(GethRunMutex(), 75L) == WAIT_TIMEOUT);
 }
