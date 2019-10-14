@@ -12,7 +12,6 @@ void Init_ID(void) { ID_ptr = 0; }
 
 void Reset_Areas(bool EXIT)
 {
-    debug(("Resetting Areas..."));
 
     Area *x;
     while (Areas->prev)
@@ -24,7 +23,6 @@ void Reset_Areas(bool EXIT)
     {
         x = Areas->next;
         free(Areas);
-        debug(("Destroyed Area: %d", ID_ptr));
         Areas = x;
         ID_ptr--;
     }
@@ -32,11 +30,9 @@ void Reset_Areas(bool EXIT)
     if (EXIT)
     {
         free(Areas);
-        debug(("Destroyed Area: %d", ID_ptr));
     }
 
     Init_ID();
-    debug(("Resetted Areas."));
 }
 
 size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Reset)
@@ -70,14 +66,13 @@ size_t New_Area(const size_t Length, const size_t Width, bool Construct, bool Re
 
 size_t New_Default_Area(bool Construct, bool Reset)
 {
-    COORD x=GetconsoleSize();
+    COORD x = GetconsoleSize();
     New_Area((size_t)x.X - 1, (size_t)x.Y - 1, Construct, Reset);
     return Areas->ID;
 }
 
 void Construct_Area(Area *a)
 {
-    debug(("Constructing Area..."));
 
     clear();
 
@@ -92,7 +87,6 @@ void Construct_Area(Area *a)
     o.x = 0;
     o.y = 0;
 
-    debug(("Building objects..."));
     while (o.x <= a->Length)
     {
         PutObject(o);
@@ -101,7 +95,6 @@ void Construct_Area(Area *a)
         o.x++;
         o.y = 0;
     }
-
     o.x = 0;
     o.y = 1;
 
@@ -113,6 +106,4 @@ void Construct_Area(Area *a)
         o.y++;
         o.x = 0;
     }
-
-    debug(("Finshed constructing Area %zu.", a->ID));
 }

@@ -6,10 +6,14 @@
 typedef int Direction;
 enum Directions
 {
+    UPLEFT,
     UP,
-    DOWN,
+    UPRIGHT,
     LEFT,
-    RIGHT
+    RIGHT,
+    DOWNLEFT,
+    DOWN,
+    DOWNRIGHT,
 };
 
 enum CellType

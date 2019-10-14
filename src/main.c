@@ -5,11 +5,23 @@
 #include <Debug.h>
 #include <ctype.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <conio.h>
 #include <Process.h>
+#include <time.h>
+#include <NeuralNetwork.h>
+#include <string.h>
 
-static int Key;
-static int ThreadPtr;
+#define random_x (SHORT)((consoleSize.X - 2 - 2) * ((SHORT)rand() / RAND_MAX) + (SHORT)2);
+#define random_y (SHORT)((consoleSize.Y - 2 - 2) * ((SHORT)rand() / RAND_MAX) + (SHORT)2);
+
+void ClearDebugFile(void);
+int NewReservedThread(void);
+
+static int Key = 0;
+static int ThreadPtr = 0;
+static int ReservedThread = 0;
+static int Seeds = 0;
 
 HANDLE hConsoleOut;
 COORD consoleSize;
@@ -30,12 +42,30 @@ int NewThread(void)
     return ThreadPtr;
 }
 
+int NewReservedThread(void)
+{
+    ReservedThread++;
+    return ReservedThread;
+}
+
+void ClearDebugFile(void)
+{
+    FILE *f = fopen("Debug_Log.txt", "w");
+    if (!f)
+        raise(2);
+    fclose(f);
+}
+
+int GetSeedPtr(void)
+{
+    Seeds++;
+    return Seeds;
+}
+
 int main(void)
 {
     Organism_p p;
-
-    Clear_Debug_File();
-    debug(("DEBUG MODE"));
+    ClearDebugFile();
 
     signal(SIGABRT, Signal_Handler);
     signal(SIGFPE, Signal_Handler);
@@ -48,7 +78,9 @@ int main(void)
     GetConsoleScreenBufferInfo(hConsoleOut, &csbiInfo);
     consoleSize.X = csbiInfo.srWindow.Right;
     consoleSize.Y = csbiInfo.srWindow.Bottom;
+
     clear();
+
     hScreenMutex = CreateMutexW(NULL, FALSE, NULL);
     hRunMutex = CreateMutexW(NULL, TRUE, NULL);
 
@@ -62,11 +94,12 @@ int main(void)
     p.Current_Thrist = 100;
     p.Max_Hunger = 100;
     p.Max_Thirst = 100;
-    p.BIRTH_POINT.X = 10;
-    p.BIRTH_POINT.Y = 10;
+    p.BIRTH_POINT.X = random_x;
+    p.BIRTH_POINT.Y = random_y;
     p.speed = 1;
 
     size_t ID;
+    NeuralNetwork *NN;
 
     while (tolower(Key) != 'q')
     {
@@ -74,15 +107,31 @@ int main(void)
         switch (tolower(Key))
         {
         case 'n':
-            if (ThreadPtr < 32)
+            if (ThreadPtr < 20)
             {
                 NewThread();
                 ID = Create_Organism(p);
                 _beginthread(Alive, 0, (void *)ID);
-                p.BIRTH_POINT.Y++;
             }
             break;
+        case 's':
+            if (ThreadPtr + NewReservedThread() < 32)
+            {
+                ID = (size_t)(ThreadPtr + ReservedThread);
+                _beginthread(Save_Strongest_NN, 0, (void *)ID);
+            }
+            break;
+        case 'a':
+            NewThread();
+            ID = Create_Organism(p);
+            NN = GetStrongestNeuralNetwork();
+            NN->ID = ID;
+
+            _beginthread(Alive, 0, (void *)ID);
+            break;
         }
+        p.BIRTH_POINT.X = random_x;
+        p.BIRTH_POINT.Y = random_y;
     }
     raise(2);
     return 0;
@@ -90,7 +139,6 @@ int main(void)
 
 void ShutdownThreads(void)
 {
-    debug(("Shutting Down threads.."));
 
     while (ThreadPtr > 0)
     {
@@ -103,11 +151,23 @@ void ShutdownThreads(void)
 
 void Signal_Handler(int n)
 {
+    Log("Signal: %d\n", n);
     ShutdownThreads();
+
+    Log("Shutted Down Threads.\n");
     clear();
+
     Destroy_Objects(true);
+    Log("Destroyed Objects.\n");
+
     Destroy_Organisms(true);
+    Log("Destoyed Organisms.\n");
+
+    Destroy_NNS(true);
+    Log("Destroyed Neural Networks.\n");
+
     Reset_Areas(true);
+    Log("Destroyed Areas.\n");
 
     if (hScreenMutex)
         CloseHandle(hScreenMutex);
@@ -115,7 +175,6 @@ void Signal_Handler(int n)
         CloseHandle(hRunMutex);
     if (hConsoleOut)
         CloseHandle(hConsoleOut);
-
-    debug(("EXIT NUM: %d", n));
+    Log("Exitted Program.\n");
     exit(0);
 }

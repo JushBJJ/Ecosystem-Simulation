@@ -8,6 +8,7 @@
 [DEBUG]: Thread Organism ID: 2
 [DEBUG]: Thread Organism ID: 3
 [DEBUG]: Thread Organism ID: 4
+[DEBUG]: Shutting Down threads..
 [DEBUG]: Destroying Objects.
 [DEBUG]: Destroyed Objects
 [DEBUG]: Destroying Organisms...
@@ -19,5 +20,4 @@
 [DEBUG]: Resetting Areas...
 [DEBUG]: Destroyed Area: 1
 [DEBUG]: Resetted Areas.
-[DEBUG]: Shutting Down threads..
 [DEBUG]: EXIT NUM: 2

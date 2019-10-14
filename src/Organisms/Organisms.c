@@ -4,141 +4,65 @@
 #include <Draw.h>
 #include <Simulation.h>
 #include <Windows.h>
+#include <stdlib.h>
 #include <process.h>
 
 static Organism *Organisms;
-static bool Init_Organisms_;
-static size_t Organisms_Count;
-static size_t idptr;
+static size_t Organisms_Count = 0;
+static size_t idptr = 0;
 
 Organism *Get_Organisms(void) { return Organisms; }
 void UpdateOrganism(Organism *o)
 {
-    Organism *x;
-    while (Organisms->prev)
-    {
-        x = Organisms->prev;
-        Organisms = x;
-    }
-    while (Organisms->next)
-    {
-        x = Organisms->next;
-        if (Organisms->ID == o->ID)
-            break;
-        Organisms = x;
-    }
-
-    Organisms = o;
+    if ((Organisms + o->ID))
+        memcpy((Organisms + o->ID), o, sizeof(Organism));
+    else
+        Log("UNABLE TO UPDATE ORGANISM ID %d\n", o->ID);
 }
 
 Organism *GetOrganism(size_t ID)
 {
-    Organism *x;
-    while (Organisms->prev)
-    {
-        x = Organisms->prev;
-        Organisms = x;
-    }
-    while (Organisms->next)
-    {
-        x = Organisms->next;
-        if (Organisms->ID == ID)
-            break;
-        Organisms = x;
-    }
-    return Organisms;
-}
-
-Organism *LockOrganism(size_t ID)
-{
-    Organism *x;
-
-    while (Organisms->prev)
-    {
-        x = Organisms->prev;
-        Organisms = x;
-    }
-
-    while (Organisms->next)
-    {
-        x = Organisms->next;
-        if (Organisms->ID == ID)
-            break;
-        Organisms = x;
-    }
-
-    if (Organisms->Locked == true)
-        Organisms->Wrong = true;
+    if ((Organisms + ID))
+        return (Organisms + ID);
     else
-        Organisms->Locked = true;
-    return Organisms;
+        return (Organism *)0x00;
 }
 
 void Destroy_Organisms(bool EXIT)
 {
-    debug(("Destroying Organisms..."));
-    Organism *x;
+    size_t ptr = 1;
 
-    while (Organisms->prev)
+    while ((Organisms + ptr))
     {
-        x = Organisms->prev;
-        Organisms = x;
-    }
-
-    while (Organisms->next)
-    {
-        debug(("Destroying Organism ID: %d", Organisms->ID));
-        x = Organisms->next;
-        free(Organisms);
-        Organisms = x;
+        free((Organisms + ptr));
+        ptr++;
     }
 
     if (EXIT)
-        free(Organisms);
+        free((Organisms + 0));
     else
-        Organisms = NULL;
-
-    debug(("Destroyed Organisms"));
+        memset((Organisms + 0), 0, sizeof(Organism));
 }
 
 size_t Create_Organism(Organism_p p)
 {
-    Organism *x;
+    size_t Amount_Of_Organisms = Organisms_Count;
+    size_t ptr = Amount_Of_Organisms;
 
-    if (!Init_Organisms_)
-    {
-        Organisms = NULL;
-        x = NULL;
-
-        Organisms = malloc(sizeof *Organisms);
-        Organisms->next = NULL;
-        Init_Organisms_ = true;
-        debug(("Initialized Organisms"));
-    }
-    while (Organisms->prev)
-    {
-        x = Organisms->prev;
-        Organisms = x;
-    }
-
-    while (Organisms->next)
-    {
-        x = Organisms->next;
-        Organisms = x;
-    }
+    if (Amount_Of_Organisms == 0)
+        Organisms = malloc(sizeof(Organism));
 
     idptr++;
     Organisms_Count++;
 
-    Organisms->ID = idptr;
-    Organisms->Properties = p;
-    Organisms->Age = 0;
-    Organisms->Children = 0;
-    Organisms->Ready_To_Breed = false;
-    Organisms->next = malloc(sizeof *Organisms);
-    Organisms->prev = x;
-    Organisms->Properties.Color = ORGANISM_COLOR_F;
-    Organisms->CURRENT = Organisms->Properties.BIRTH_POINT;
+    (Organisms + ptr)->ID = Amount_Of_Organisms;
+    (Organisms + ptr)->Properties = p;
+    (Organisms + ptr)->Age = 0;
+    (Organisms + ptr)->Children = 0;
+    (Organisms + ptr)->Ready_To_Breed = false;
+    (Organisms + ptr)->next = (Organism *)malloc(sizeof(Organism));
+    (Organisms + ptr)->Properties.Color = ORGANISM_COLOR_F;
+    (Organisms + ptr)->CURRENT = (Organisms + ptr)->Properties.BIRTH_POINT;
 
-    return Organisms->ID;
+    return (Organisms + ptr)->ID;
 }

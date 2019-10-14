@@ -32,6 +32,7 @@ ifdef ComSpec
 	TEST_DIR = ./test/
 	HDR_DIR = $(SRC_DIR)headers/
 
+	SAVE_READ_SRC=$(SRC_DIR)SaveRead/
 	Organisms_SRC = $(SRC_DIR)Organisms/
 	Enviorment_SRC = $(SRC_DIR)Enviorment/
 	Debug_SRC = $(SRC_DIR)Debug/
@@ -40,7 +41,7 @@ ifdef ComSpec
 	VPATH = $(subst /,\,$(VPATHX))
 
 	# Files
-	SRC_FILES = $(wildcard $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c *.c $(Debug_SRC)*.c)
+	SRC_FILES = $(wildcard $(SAVE_READ_SRC)*.c $(Organisms_SRC)*.c $(Enviorment_SRC)*.c $(SRC_DIR)*.c *.c $(Debug_SRC)*.c)
 	HEADER_FILES = $(wildcard $(SRC_DIR)*.h $(Enviorment_SRC)*.h $(Organisms_SRC)*.h $(HDR_DIR)*.h)
 	OBJ_FILESX = $(patsubst $(SRC_DIR)%.c,$(BUILD_DIR)%.o,$(SRC_FILES))
 	OBJ_FILES = $(subst /,\,$(OBJ_FILESX))
@@ -88,7 +89,7 @@ endif
 .SUFFIX: .c .o
 .PRECIOUS: $(SRC_FILES) $(HEADER_FILES)
 
-build: $(OBJ_FILESX)
+build: clean $(OBJ_FILESX)
 	$(CC) $(CFLAGS) $(OBJ_FILESX) -o $(EXECUTABLE)
 
 info:
@@ -103,7 +104,7 @@ info:
 
 debug: CFLAGS+=-DDEBUG -g
 debug: build
-	gdb -ex "target exec $(EXECUTABLE)" -ex "run"
+	gdb -ex "target exec $(EXECUTABLE)" -ex "file build/Simulation.exe" -ex "set print thread-events off"
 
 $(BUILD_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) -o $@ -c $< $(CFLAGS)

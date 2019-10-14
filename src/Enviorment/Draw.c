@@ -11,11 +11,9 @@ static size_t ID_ptr;
 static bool Init_Objects_;
 
 size_t Get_Object_Num(void) { return Object_Count; }
-static bool Initialized;
 
 void Destroy_Objects(bool EXIT)
 {
-    debug(("Destroying Objects."));
     Object *x;
 
     while (Objects->next)
@@ -32,7 +30,6 @@ void Destroy_Objects(bool EXIT)
     else
         Objects = NULL;
 
-    debug(("Destroyed Objects"));
 }
 
 void CursorPos(int x, int y)
@@ -77,7 +74,6 @@ void PutObject(Properties o)
         Init_Objects_ = true;
         Objects = malloc(sizeof *Objects);
         Objects->next = NULL;
-        debug(("Initialized Objects"));
     }
     while (Objects->next)
     {
