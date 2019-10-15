@@ -70,7 +70,7 @@ NeuralNetwork *NewNN(size_t Organism_ID)
         (NNS + ptr)->INN[j].Synapse_Weight = calloc(defaultHiddenLayerSize - 1, sizeof(float) + 10);
         while (z <= defaultHiddenLayerSize - 1)
         {
-            (NNS + ptr)->INN[j].Synapse_Weight[z] = getrandom(-1, 1);
+            (NNS + ptr)->INN[j].Synapse_Weight[z] = getrandom(0, 100);
             z++;
         }
         z = 0;
@@ -78,9 +78,9 @@ NeuralNetwork *NewNN(size_t Organism_ID)
     for (size_t j = 0, z = 0; j <= sizeof((NNS + ptr)->HNN) / sizeof((NNS + ptr)->HNN[0]); j++)
     {
         (NNS + ptr)->HNN[j].Synapse_Weight = calloc(defaultOutputLayerSize - 1, sizeof(float) + 10);
-        while (z <= defaultInputLayerSize - 1)
+        while (z <= defaultOutputLayerSize - 1)
         {
-            (NNS + ptr)->HNN[j].Synapse_Weight[z] = getrandom(-1, 1);
+            (NNS + ptr)->HNN[j].Synapse_Weight[z] = getrandom(0, 100);
             z++;
         }
         z = 0;
