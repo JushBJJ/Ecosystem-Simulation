@@ -100,8 +100,7 @@ void Forward(NeuralNetwork *LocalNN)
         Rangeptr = 0;
     }
     HNptr = 0;
-
-    // Needs fix
+    
     while (Outptr <= Output_Node_Array_Size)
     {
         while (HNptr <= Hidden_Node_Array_Size)
