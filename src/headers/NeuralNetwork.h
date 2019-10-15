@@ -5,7 +5,7 @@
 #include <Organisms.h>
 
 #define defaultInputLayerSize 8
-#define defaultOutputLayerSize 9
+#define defaultOutputLayerSize 8
 #define defaultHiddenLayerSize 16
 
 #define getrandom(min, max) (float)(max - min) * ((float)rand() / RAND_MAX) + (float)min
@@ -20,7 +20,6 @@ enum Nodes
     DOWNLEFT_N,
     DOWN_N,
     DOWNRIGHT_N,
-    STATIONARY_N
 };
 
 typedef struct Input_Node
